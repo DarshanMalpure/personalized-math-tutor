@@ -66,17 +66,19 @@ User profile:
 
     mul = extract_multiplication(message)
 
-    if mul:
-        a, b = mul
-        result = multiply(a, b)
+if mul:
+    a, b = mul
+    result = multiply(a, b)
 
-        return f"""
+    repeated_addition = " + ".join([str(b)] * a)
+
+    return f"""
 Let's solve this step by step 😊
 
 We are multiplying {a} × {b}.
 
 This means adding {b}, {a} times:
-{b} + {b} + {b} = {result}
+{repeated_addition} = {result}
 
 ✅ Final Answer: {a} × {b} = {result}
 """
@@ -155,4 +157,5 @@ for role, msg in st.session_state.chat_history:
         st.markdown(f"**🧑 You:** {msg}")
     else:
         st.markdown(f"**🤖 Tutor:** {msg}")
+
 
