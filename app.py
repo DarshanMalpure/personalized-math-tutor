@@ -44,6 +44,15 @@ def remember(user_id, text):
         if match:
             st.session_state.user_memory[user_id]["weakness"] = match.group(1).strip()
             break
+def multiply(a: int, b: int) -> int:
+    return a * b
+import re
+
+def extract_multiplication(text):
+    match = re.search(r"(\d+)\s*\*\s*(\d+)", text)
+    if match:
+        return int(match.group(1)), int(match.group(2))
+    return None
 
 def chat(user_id, message):
     remember(user_id, message)
@@ -55,17 +64,66 @@ User profile:
 - Weak topic: {mem.get("weakness", "unknown")}
 """
 
+    mul = extract_multiplication(message)
+
+    if mul:
+        a, b = mul
+        result = multiply(a, b)
+
+        return f"""
+Let's solve this step by step 😊
+
+We are multiplying {a} × {b}.
+
+This means adding {b}, {a} times:
+{b} + {b} + {b} = {result}
+
+✅ Final Answer: {a} × {b} = {result}
+"""
+
     prompt = memory_text + """
 You are a friendly math tutor.
-Be encouraging and helpful.
 
 User: """ + message
 
-    response = llm.invoke(
-        [HumanMessage(content=prompt)]
-    )
-
+    response = llm.invoke([HumanMessage(content=prompt)])
     return response.content
+
+def chat(user_id, message):
+    remember(user_id, message)
+
+    mem = st.session_state.user_memory.get(user_id, {})
+    memory_text = f"""
+User profile:
+- Name: {mem.get("name", "unknown")}
+- Weak topic: {mem.get("weakness", "unknown")}
+"""
+
+    mul = extract_multiplication(message)
+
+    if mul:
+        a, b = mul
+        result = multiply(a, b)
+
+        return f"""
+Let's solve this step by step 😊
+
+We are multiplying {a} × {b}.
+
+This means adding {b}, {a} times:
+{b} + {b} + {b} = {result}
+
+✅ Final Answer: {a} × {b} = {result}
+"""
+
+    prompt = memory_text + """
+You are a friendly math tutor.
+
+User: """ + message
+
+    response = llm.invoke([HumanMessage(content=prompt)])
+    return response.content
+
 
 # -----------------------------
 # STREAMLIT UI
